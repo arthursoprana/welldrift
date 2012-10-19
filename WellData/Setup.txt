@@ -1,0 +1,23 @@
+Number of Points	       : 10
+Inclination		  [deg]: 85.0
+Well Length 		    [m]: 1000.0
+Timestep 		    [s]: 0.1
+Initial Pressure 	   [Pa]: 1000000.0
+Initial Mixture Velocity  [m/s]: 0.0
+Initial Gas Volume Fraction [-]: 0.1
+Initial Oil Volume Fraction [-]: 0.6
+Well Diameter 		    [m]: 0.3
+Toe Mixture Velocity      [m/s]: 0.0
+Tolerance 		    [-]: 1.0e-6
+Maximum Timestep            [s]: 1000
+Final Time                  [s]: 10000
+Heel Pressure 		   [Pa]: 1000000.0
+Reference Temperature	    [K]: 323.0
+Oil Density 		[kg/m3]: 800.0
+Oil Viscosity 		 [Pa.s]: 1.5e-3
+Water Density 		[kg/m3]: 1000.0
+Water Viscosity 	 [Pa.s]: 0.5471e-3
+Gas Ref. Density 	[kg/m3]: 0.0
+Gas Ref. Pressure 	   [Pa]: 0.0
+Gas Sound Speed		  [m/s]: 463.25
+Gas Viscosity 		 [Pa.s]: 12.09e-6
