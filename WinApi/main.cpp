@@ -231,7 +231,7 @@ int main( int argc, char **argv ) {
     GtkObject *adjustment_tolerance; adjustment_tolerance   = gtk_adjustment_new(well_initial_data->m_tolerance, -1.0e50, 1.0e50, 1, 1, 0);
 
     GtkWidget *spin_button_timestep;    spin_button_timestep   = gtk_spin_button_new(GTK_ADJUSTMENT(adjustment_timestep), 0.1,3);
-    GtkWidget *spin_button_max_delta_t;  spin_button_max_delta_t = gtk_spin_button_new(GTK_ADJUSTMENT(adjustment_max_delta_t), 0.1,1);
+    GtkWidget *spin_button_max_delta_t;  spin_button_max_delta_t = gtk_spin_button_new(GTK_ADJUSTMENT(adjustment_max_delta_t), 0.1,3);
     GtkWidget *spin_button_final_time;  spin_button_final_time = gtk_spin_button_new(GTK_ADJUSTMENT(adjustment_final_time), 0.1,1);
     GtkWidget *spin_button_tolerance;   spin_button_tolerance  = gtk_spin_button_new(GTK_ADJUSTMENT(adjustment_tolerance), 0.1,10);  
 
