@@ -47,24 +47,19 @@ void show_about_info(){
     gtk_window_set_icon(GTK_WINDOW(dialog), create_pixbuf(".\\images\\icon.png"));
     gtk_about_dialog_set_name(GTK_ABOUT_DIALOG(dialog), "WellDrift Simulator");
     gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), "v0.1"); 
-    //gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog),"email: arthur@sinmec.ufsc.br\nDepartament of Mechanical Engineering\nFederal University of Santa Catarina - UFSC\nFlorianopolis - SC - Brazil");
-    gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog),"Informacoes ocultadas de acordo com regras\ndo edital do Premio Petrobras de Tecnologia\nXXXX\nBrazil");
+    gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog),"email: arthur@sinmec.ufsc.br\nDepartament of Mechanical Engineering\nFederal University of Santa Catarina - UFSC\nFlorianopolis - SC - Brazil");
     
     const char *authors[]= {"Arthur B. Soprano\t-\tMechanical Engineer",
                             "A. Fabio C. da Silva\t-\tProfessor",
                             "Clovis R. Maliska\t-\tProfessor", NULL};
-    const char *authors_null[]= {"Em virtude das regras do Premio Petrobras",
-        "de Tecnologia 2012 os nomes dos autores",
-        "permanecerao ocultos ate o final da avaliacao,",
-        "atendendo as regras do edital.", NULL};
-    gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(dialog), (const gchar**)authors_null);
+   
+    gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(dialog), (const gchar**)authors);
     gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), 
         "WellDrift is a three-phase, one-dimensional, drift-flux well simulator. The problem is solved using the Finite Volume Method and a Newton-Raphson algorithm to solve the coupled equations.");      
     
     g_signal_connect( G_OBJECT(dialog  ), "activate-link", G_CALLBACK(open_url_hook), NULL);                                             
     
-    //gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog),"http://www.sinmec.ufsc.br");
-    gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog),"xxxxxxxxxxxxxxxx");
+    gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog),"http://www.sinmec.ufsc.br");
     gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dialog), pixbuf);
     g_object_unref(pixbuf), pixbuf = NULL;
     gtk_dialog_run(GTK_DIALOG (dialog));
