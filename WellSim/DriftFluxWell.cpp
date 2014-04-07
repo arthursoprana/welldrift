@@ -51,6 +51,13 @@ namespace WellSimulator {
 		double now;
 		double old;
 	};
+
+    real_type calculate_inclination_correction(real_type p_inclination){
+        return - (  boost::math::cbrt(cos(p_inclination)) 
+                  * pow( abs(cos(p_inclination)), 1.0/6.0 ) 
+                  * pow(1.0 + sin(p_inclination),2.0) 
+                 );
+    }
 	
 	DriftFluxWell::DriftFluxWell()
 	{
@@ -76,7 +83,8 @@ namespace WellSimulator {
 								  m_delta			( total_var, 0 ),
                                   m_matrix   (new smatrix_type(total_var*p_nnodes,total_var*p_nnodes)),
                                   m_variables(new svector_type(total_var*p_nnodes)),
-                                  m_source   (new svector_type(total_var*p_nnodes))
+                                  m_source   (new svector_type(total_var*p_nnodes)),
+                                  m_has_inclination_correction(true)
 	{					 
 	    
 
@@ -132,9 +140,9 @@ namespace WellSimulator {
         m_delta.resize			    ( total_var, 0 );
         m_total_production.resize   ( NumberOfPhases, 0);
        
-        m_oil_flow	= SharedPointer<vector_type>( new vector_type(well_size, 0.0) );
-        m_gas_flow	= SharedPointer<vector_type>( new vector_type(well_size, 0.0) );
-        m_water_flow= SharedPointer<vector_type>( new vector_type(well_size, 0.0) );
+        m_oil_flow.resize(well_size, MakeShared<ConstantInflow>(0.0));
+        m_gas_flow.resize(well_size, MakeShared<ConstantInflow>(0.0));
+        m_water_flow.resize(well_size, MakeShared<ConstantInflow>(0.0));
 
         m_matrix	= SharedPointer<smatrix_type>( new smatrix_type(total_var*well_size,total_var*well_size) );
         m_variables = SharedPointer<svector_type>( new svector_type(total_var*well_size) );
@@ -224,12 +232,12 @@ namespace WellSimulator {
         this->set_boundary_velocity( 0.0 );        
         this->set_newton_criteria( TOLERANCE );
 
+        inflow_vector_type inflow_gas(NODES, MakeShared<ConstantInflow>(0.0));
+        inflow_vector_type inflow_oil(NODES, MakeShared<ConstantInflow>(0.0));
+        inflow_vector_type inflow_water(NODES, MakeShared<ConstantInflow>(0.0));
 
-        SharedPointer<vector_type> Qgas(new vector_type(NODES, 0));
-        SharedPointer<vector_type> Qwater(new vector_type(NODES, 0));
-        SharedPointer<vector_type> Qoil(new vector_type(NODES, 0));
+        this->initialize_flow(inflow_oil,inflow_water,inflow_gas);
 
-        this->initialize_flow(Qoil,Qwater,Qgas); 
         this->set_coordinates(COORD_VECTOR);
         this->set_gravity( 0., 0., 9.8 ); 
     }
@@ -339,18 +347,18 @@ namespace WellSimulator {
 	}
 
 	real_type DriftFluxWell::friction_factor( real_type p_reynolds ){
-		if( p_reynolds == 0. )
-			return 0.;
-        else{
-            double e = 1.0e-4; // FoFo
-            double D = 2.0*m_radius;                
-            double l = log(pow(7.0/p_reynolds,0.9) + 0.27*e/D);             
-            double A = pow(-2.547*l,16.0);              
-            double B = pow(37530.0/p_reynolds,16.0);                 
-            double f0 = 8.0*pow(pow(8.0/p_reynolds,12.0)+1.0/pow((A+B),1.5),1.0/12.0);             
-            return f0;
-        }
-			//return abs(64/p_reynolds); // Laminar AtTheMoment...			
+		//if( p_reynolds == 0.0 )
+		//	return 0.0;
+  //      else{
+  //          double e = 1.0e-4; // FoFo
+  //          double D = 2.0*m_radius;                
+  //          double l = log(pow(7.0/p_reynolds,0.9) + 0.27*e/D);             
+  //          double A = pow(-2.547*l,16.0);              
+  //          double B = pow(37530.0/p_reynolds,16.0);                 
+  //          double f0 = 8.0*pow(pow(8.0/p_reynolds,12.0)+1.0/pow((A+B),1.5),1.0/12.0);             
+  //          return f0;
+  //      }
+        return p_reynolds == 0.0 ? 0.0 : abs(64/p_reynolds); // Laminar AtTheMoment...			
 	}
 
 	real_type DriftFluxWell::mean_velocity( uint_type p_index ){
@@ -439,7 +447,10 @@ namespace WellSimulator {
         m_gas_liquid_drift_velocity_model->set_characteristic_velocity(Vc);
         m_gas_liquid_drift_velocity_model->set_profile_parameter(C_0_gl);
 		real_type v_d   = m_gas_liquid_drift_velocity_model->compute_drift_velocity();
-        v_d = - boost::math::cbrt(cos(m_well_inclination)) * pow( abs(cos(m_well_inclination)), 1.0/6.0 ) * pow(1.0+sin(m_well_inclination),2.0) * v_d;
+
+        if(m_has_inclination_correction){
+            v_d *= calculate_inclination_correction(m_well_inclination);
+        }        
 
 		return (v_d+(C_0_gl-1)*p_mean_velocity)/(1-(C_0_gl-1)*p_gas_vol_frac*(rho_l-rho_g)/rho_m );		
 	}
@@ -481,7 +492,9 @@ namespace WellSimulator {
         m_oil_water_drift_velocity_model->set_characteristic_velocity(Vc);
 		real_type v_d   = m_oil_water_drift_velocity_model->compute_drift_velocity();
 
-        v_d = - boost::math::cbrt(cos(m_well_inclination)) * pow( abs(cos(m_well_inclination)), 1.0/6.0 ) * pow(1.0+sin(m_well_inclination),2.0) * v_d;
+        if(m_has_inclination_correction){
+            v_d *= calculate_inclination_correction(m_well_inclination);
+        }
 
         float64 a3 = 0.017*exp( pow(m_well_inclination,3.28) );
         if (p_gas_vol_frac < a3){
@@ -659,15 +672,20 @@ namespace WellSimulator {
                 real_type rhoL_W		= this->liquid_density( p_oil_vol_fracW, water_vol_fracW, p_pressureW );
                 
                 real_type mixture_inlet;
-                if(m_mass_flux){
-                    mixture_inlet = (*m_oil_flow)[ p_node ] + (*m_water_flow)[ p_node ] + (*m_gas_flow)[ p_node ];
+
+                real_type Qoil = m_oil_flow[ p_node ]->get_current_value();
+                real_type Qwater = m_water_flow[ p_node ]->get_current_value();
+                real_type Qgas = m_gas_flow[ p_node ]->get_current_value();
+
+                if(m_mass_flux){   
+                    mixture_inlet = Qoil + Qwater + Qgas;
                 }                      
                 else
                 {
 				    real_type rhoGas_P	     = this->gas_density	( p_pressureP );
 				    real_type rhoWater_P	 = this->water_density	( p_pressureP );
 				    real_type rhoOil_P	     = this->oil_density	( p_pressureP );
-				    mixture_inlet  = rhoOil_P*(*m_oil_flow)[ p_node ] + rhoWater_P*(*m_water_flow)[ p_node ] + rhoGas_P*(*m_gas_flow)[ p_node ];
+				    mixture_inlet  = rhoOil_P*Qoil + rhoWater_P*Qwater + rhoGas_P*Qgas;
                 }  				
 
 				
@@ -757,16 +775,21 @@ namespace WellSimulator {
                 real_type rhoL_W		= this->liquid_density( p_oil_vol_fracW, water_vol_fracW, p_pressureW );
                 
                 real_type mixture_inlet;
-                if(m_mass_flux){
-                    mixture_inlet = (*m_oil_flow)[ p_node ] + (*m_water_flow)[ p_node ] + (*m_gas_flow)[ p_node ];
+
+                real_type Qoil = m_oil_flow[ p_node ]->get_current_value();
+                real_type Qwater = m_water_flow[ p_node ]->get_current_value();
+                real_type Qgas = m_gas_flow[ p_node ]->get_current_value();
+
+                if(m_mass_flux){   
+                    mixture_inlet = Qoil + Qwater + Qgas;
                 }                      
                 else
                 {
                     real_type rhoGas_P	     = this->gas_density	( p_pressureP );
                     real_type rhoWater_P	 = this->water_density	( p_pressureP );
                     real_type rhoOil_P	     = this->oil_density	( p_pressureP );
-                    mixture_inlet  = rhoOil_P*(*m_oil_flow)[ p_node ] + rhoWater_P*(*m_water_flow)[ p_node ] + rhoGas_P*(*m_gas_flow)[ p_node ];
-                }
+                    mixture_inlet  = rhoOil_P*Qoil + rhoWater_P*Qwater + rhoGas_P*Qgas;
+                }  
 
 
                 real_type mod_Vow_e	= this->mod_v_drift_flux_ow( 
@@ -896,15 +919,16 @@ namespace WellSimulator {
 				real_type rhoL_W		= this->liquid_density( p_oil_vol_fracW, water_vol_fracW, p_pressureW );
                 
                 real_type gas_inlet;
+
+                real_type Qgas = m_gas_flow[ p_node ]->get_current_value();
                 if(m_mass_flux){
-                    gas_inlet = (*m_gas_flow)[ p_node ];
+                    gas_inlet = Qgas;
                 }                      
                 else
                 {
-                    gas_inlet = rhoG_P*(*m_gas_flow)[ p_node ];
+                    gas_inlet = rhoG_P*Qgas;
                 }
-				
-				
+
 
 
 				real_type mod_Vgj_w	= this->mod_v_drift_flux( 
@@ -953,12 +977,13 @@ namespace WellSimulator {
 				real_type rhoL_W		= this->liquid_density( p_oil_vol_fracW, water_vol_fracW, p_pressureW );
 
                 real_type gas_inlet;
+                real_type Qgas = m_gas_flow[ p_node ]->get_current_value();
                 if(m_mass_flux){
-                    gas_inlet = (*m_gas_flow)[ p_node ];
+                    gas_inlet = Qgas;
                 }                      
                 else
                 {
-                    gas_inlet = rhoG_P*(*m_gas_flow)[ p_node ];
+                    gas_inlet = rhoG_P*Qgas;
                 }
 
 				real_type mod_Vgj_e		= this->mod_v_drift_flux( 
@@ -1040,12 +1065,13 @@ namespace WellSimulator {
 				real_type rhoL_W		= this->liquid_density( p_oil_vol_fracW, water_vol_fracW, p_pressureW );
                 
                 real_type oil_inlet;
+                real_type Qoil = m_oil_flow[ p_node ]->get_current_value();
                 if(m_mass_flux){
-                    oil_inlet = (*m_oil_flow)[ p_node ];
+                    oil_inlet = Qoil;
                 }                      
                 else
                 {
-                    oil_inlet = rhoO_P*(*m_oil_flow)[ p_node ];
+                    oil_inlet = rhoO_P*Qoil;
                 }
 				
 
@@ -1119,12 +1145,13 @@ namespace WellSimulator {
 				real_type rhoL_W		= this->liquid_density( p_oil_vol_fracW, water_vol_fracW, p_pressureW );
 
                 real_type oil_inlet;
+                real_type Qoil = m_oil_flow[ p_node ]->get_current_value();
                 if(m_mass_flux){
-                    oil_inlet = (*m_oil_flow)[ p_node ];
+                    oil_inlet = Qoil;
                 }                      
                 else
                 {
-                    oil_inlet = rhoO_P*(*m_oil_flow)[ p_node ];
+                    oil_inlet = rhoO_P*Qoil;
                 }
 
 				real_type mod_Vow_e	= this->mod_v_drift_flux_ow( 

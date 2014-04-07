@@ -53,6 +53,7 @@ namespace WellSimulator {
 
 
 
+    
 
 	// DriftFluxWell ===================================================================================
 	class DriftFluxWell : public GenericWell
@@ -282,6 +283,10 @@ namespace WellSimulator {
         real_type get_oil_volumetric_flux(uint_type p_index){ return m_oil_vol_frac[p_index]*m_oil_velocity[p_index]*area(); }
         real_type get_water_volumetric_flux(uint_type p_index){ return m_water_vol_frac[p_index]*m_water_velocity[p_index]*area(); }
 
+        void set_has_inclination_correction(bool p_has_inclination_correction){
+            m_has_inclination_correction = p_has_inclination_correction;
+        }
+
         void set_inclination(real_type p_inclination){
             m_well_inclination = p_inclination;
         }
@@ -336,6 +341,7 @@ namespace WellSimulator {
 		bool		m_with_gas;
         bool        m_mass_flux;
         bool        m_convergence_status;
+        bool        m_has_inclination_correction;
 		real_type	m_profile_parameter_C_0;
 		real_type   m_HEEL_PRESSURE;
 		real_type   m_oil_API;

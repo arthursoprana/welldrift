@@ -9,7 +9,7 @@
 #include <BoostWrapper/SmartPointer.h>
 // Namespace =======================================================================================
 namespace WellSimulator {
-using namespace boost_wrapper;  
+using namespace boost_wrapper;   
 
 // GenericWell ====================================================================================
 class GenericWell : public AbstractWell
@@ -30,9 +30,9 @@ public:
 public:
 	virtual void set_size(const uint_type& p_nnodes);
 	virtual void initialize_flow( 
-								 SharedPointer<vector_type> p_oil_flow_vector,
-								 SharedPointer<vector_type> p_water_flow_vector,
-								 SharedPointer<vector_type> p_gas_flow_vector
+								 inflow_vector_type p_oil_flow_vector,
+								 inflow_vector_type p_water_flow_vector,
+								 inflow_vector_type p_gas_flow_vector
 								 );
 	
 	virtual void set_radius(const real_type& p_radius);
@@ -48,9 +48,9 @@ protected:
 	uint_type				m_nnodes;
 	real_type				m_radius;
 	std::vector<coord_type> m_coordinates; 
-    SharedPointer<vector_type>	m_oil_flow;
-	SharedPointer<vector_type>   m_water_flow;
-	SharedPointer<vector_type>   m_gas_flow;
+    inflow_vector_type	m_oil_flow;
+	inflow_vector_type   m_water_flow;
+	inflow_vector_type   m_gas_flow;
 	vector_type				m_pressure;
 };
 

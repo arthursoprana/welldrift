@@ -34,9 +34,9 @@ namespace WellSimulator {
 	}
 
 	void GenericWell::initialize_flow( 
-									 SharedPointer<vector_type> p_oil_flow_vector,
-									 SharedPointer<vector_type> p_water_flow_vector,
-									 SharedPointer<vector_type> p_gas_flow_vector
+									 inflow_vector_type p_oil_flow_vector,
+									 inflow_vector_type p_water_flow_vector,
+									 inflow_vector_type p_gas_flow_vector
 									 )
 	{
        /* for(uint_type i = 1; i < this->m_oil_flow->size(); ++i){

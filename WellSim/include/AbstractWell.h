@@ -9,6 +9,33 @@
 // Namespace =======================================================================================
 namespace WellSimulator {
 
+    class IPhaseInflowExpression {
+    public:
+        virtual void calculate_value_at_time(real_type p_time) = 0;
+
+        real_type get_current_value(){
+            return m_value;
+        }
+
+    protected:
+        real_type m_value;
+    };
+
+    class ConstantInflow 
+        : public IPhaseInflowExpression
+    {
+    public:
+        ConstantInflow(real_type p_value)  
+        {   
+            m_value = p_value;
+        }
+
+        void calculate_value_at_time(real_type p_time){     
+        }
+    };
+
+    typedef std::vector< SharedPointer<IPhaseInflowExpression> > inflow_vector_type;
+
 // AbstractWell ===================================================================================
 class AbstractWell
 {
@@ -28,9 +55,9 @@ public:
 public:
 	virtual void set_size(const uint_type& p_nnodes) = 0;
 	virtual void initialize_flow(
-								 SharedPointer<vector_type> p_oil_flow_vector,
-								 SharedPointer<vector_type> p_water_flow_vector,
-								 SharedPointer<vector_type> p_gas_flow_vector
+								 inflow_vector_type p_oil_flow_vector,
+								 inflow_vector_type p_water_flow_vector,
+								 inflow_vector_type p_gas_flow_vector
 								 ) = 0;
 	virtual void set_radius(const real_type& p_radius) = 0;
 	virtual void read_coordinates( std::ifstream& p_infile) = 0;

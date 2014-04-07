@@ -198,7 +198,8 @@ void run(GtkWidget *widget, gpointer p_data)
     }
     
 
-    SharedPointer<DriftFluxWell> well = simulate(_data->m_well_initial_data);
+    //SharedPointer<DriftFluxWell> well = simulate(_data->m_well_initial_data);
+    SharedPointer<DriftFluxWell> well = simulate_provenzano(_data->m_well_initial_data);
     // Function definition
 
     int number_of_points = well->number_of_nodes();
