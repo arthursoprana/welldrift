@@ -104,7 +104,7 @@ namespace WellSimulator {
 		void GMRES_Solve( smatrix_type &A, svector_type &x, svector_type &b );
 		void compute_Jacobian();
 		void update_variables();
-
+        void update_variables_for_new_timestep();
 		
 		real_type liquid_density(
 			real_type p_oil_vol_frac,

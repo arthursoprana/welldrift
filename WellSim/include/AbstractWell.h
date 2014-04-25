@@ -32,6 +32,74 @@ namespace WellSimulator {
 
         void calculate_value_at_time(real_type p_time){     
         }
+    };       
+
+    class SlugInflow
+        : public IPhaseInflowExpression
+    {
+    public:
+        SlugInflow( real_type p_max_value
+                  , real_type p_initial_time
+                  , real_type p_final_time
+                  , real_type p_initial_transition_time
+                  , real_type p_final_transition_time)  
+            : m_max_value(p_max_value)
+            , m_initial_time(p_initial_time)
+            , m_final_time(p_final_time)
+            , m_initial_transition_time(p_initial_transition_time)
+            , m_final_transition_time(p_final_transition_time)
+        {   
+        }
+
+        void calculate_value_at_time(real_type p_time){
+            if(p_time >= m_initial_time && p_time <= m_initial_time + m_initial_transition_time){
+                m_value = (m_max_value/m_initial_transition_time) * p_time;
+            }
+            else if( m_initial_time + m_initial_transition_time < p_time && p_time < m_final_time - m_final_transition_time){
+                m_value = m_max_value;
+            }
+            else if(m_final_time - m_final_transition_time <= p_time && p_time <= m_final_time){
+                m_value = -(m_max_value/m_final_transition_time) * (p_time - m_final_time);
+            }
+            else{
+                m_value = 0.0;
+            }
+        }
+    protected:
+        real_type m_max_value;
+        real_type m_initial_time;
+        real_type m_final_time;
+        real_type m_initial_transition_time;
+        real_type m_final_transition_time;
+    };
+
+    class ProvenzanoCase2GasInflow 
+        : public SlugInflow
+    {
+    public:
+        ProvenzanoCase2GasInflow() : SlugInflow(0.08, 0.0, 70.0, 10.0, 20.0)  
+        {   
+        }
+    };
+
+    class ProvenzanoCase2OilInflow 
+        : public IPhaseInflowExpression
+    {
+    public:
+        ProvenzanoCase2OilInflow(real_type p_max_value) : m_max_value(p_max_value) 
+        {   
+        }
+
+        void calculate_value_at_time(real_type p_time){
+            if(p_time <= 10.0){
+                m_value = (m_max_value/10.0) * p_time;
+            }             
+            else{
+                m_value =  m_max_value;
+            }
+        }
+    protected:
+        real_type m_max_value;
     };
 
     typedef std::vector< SharedPointer<IPhaseInflowExpression> > inflow_vector_type;

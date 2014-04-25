@@ -250,32 +250,44 @@ SharedPointer<DriftFluxWell> simulate_provenzano(SharedPointer<WellInitialData> 
     wells->set_mass_flux( true ); // mass inflow flux
     wells->set_newton_criteria( p_initial_data->m_tolerance );
 
-    inflow_vector_type inflow_gas(p_initial_data->m_number_of_nodes, MakeShared<ConstantInflow>(0.0));
-    inflow_vector_type inflow_oil(p_initial_data->m_number_of_nodes, MakeShared<ConstantInflow>(0.0));
-    inflow_vector_type inflow_water(p_initial_data->m_number_of_nodes, MakeShared<ConstantInflow>(0.0));
+    real_type n_nodes = p_initial_data->m_number_of_nodes;
+    real_type length = p_initial_data->m_well_length;
+    real_type delta_x = length/n_nodes;
 
-    inflow_gas[ p_initial_data->m_number_of_nodes-1 ] = MakeShared<ConstantInflow>(0.02);
-    inflow_oil[ p_initial_data->m_number_of_nodes-1 ] = MakeShared<ConstantInflow>(3.0);
+    inflow_vector_type inflow_gas(n_nodes, MakeShared<ConstantInflow>(0.0));
+    inflow_vector_type inflow_oil(n_nodes, MakeShared<ConstantInflow>(0.0));
+    inflow_vector_type inflow_water(n_nodes, MakeShared<ConstantInflow>(0.0));  
+    
+    for(int i = 0 ; i < n_nodes; ++i){
+        
+        real_type pos = i*delta_x + 0.5*delta_x;
+
+        if( pos > 450.0 && pos < 550.0){
+            real_type influx_length = 550.0 - 450.0;
+            real_type Qoil_per_meter   = 0.0  / influx_length;
+            real_type Qwater_per_meter = 0.0  / influx_length;
+            real_type Qgas_per_meter   = 0.8 / influx_length;           
+
+            real_type Qoil   = Qoil_per_meter   * delta_x;
+            real_type Qwater = Qwater_per_meter * delta_x;
+            real_type Qgas   = Qgas_per_meter   * delta_x;           
+
+            inflow_oil[i] = MakeShared<SlugInflow>(Qoil, 0.0, 70.0, 10.0, 20.0);
+            inflow_water[i] = MakeShared<ConstantInflow>(Qwater);
+            inflow_gas[i] = MakeShared<SlugInflow>(Qgas, 0.0, 70.0, 10.0, 20.0);
+        }              
+    }
+
+    uint_type toe_idx = n_nodes-1;
+    // CASE 1
+    //inflow_gas[ toe_idx ] = MakeShared<ConstantInflow>(0.02);
+    //inflow_oil[ toe_idx ] = MakeShared<ConstantInflow>(3.0);
+
+    // CASE 2
+    inflow_gas[ toe_idx ] = MakeShared<ProvenzanoCase2GasInflow>();
+    inflow_oil[ toe_idx ] = MakeShared<ProvenzanoCase2OilInflow>(12.0);
 
     wells->initialize_flow(inflow_oil,inflow_water,inflow_gas);
-
-    /*
-    vector_type Qgas    (p_initial_data->m_number_of_nodes, 0.0);
-    vector_type Qwater  (p_initial_data->m_number_of_nodes, 0.0);
-    vector_type Qoil    (p_initial_data->m_number_of_nodes, 0.0);
-    
-    Qwater[ p_initial_data->m_number_of_nodes-1 ] = 0.0;
-    Qgas[ p_initial_data->m_number_of_nodes-1 ] = 0.02;
-    Qoil[ p_initial_data->m_number_of_nodes-1 ] = 3.0;
-    SharedPointer<vector_type> temp_oil(new vector_type(Qoil));
-    SharedPointer<vector_type> temp_water(new vector_type(Qwater));
-    SharedPointer<vector_type> temp_gas(new vector_type(Qgas));
-    p_initial_data->m_oil_inflow    = temp_oil;
-    p_initial_data->m_water_inflow  = temp_water;
-    p_initial_data->m_gas_inflow    = temp_gas;
-    wells->initialize_flow(p_initial_data->m_oil_inflow,p_initial_data->m_water_inflow,p_initial_data->m_gas_inflow);      */
-
-
 
     wells->set_coordinates(COORD_VECTOR);
     wells->set_gravity( 0., 0., 9.8 );      

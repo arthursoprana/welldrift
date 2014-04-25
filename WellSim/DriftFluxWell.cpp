@@ -33,21 +33,36 @@ namespace WellSimulator {
 
 	class Timer{
 	public:
-		Timer(){}
+        Timer() : m_print_time(false) {}
 
-		void start(){
+		inline void start(){
 			this->old = (double)clock()/CLOCKS_PER_SEC;
 		}
 
-		void stop(){
+		inline void stop(){
 			this->now = (double)clock()/CLOCKS_PER_SEC;
 		}
 
-		double elapsed(){
+		inline double elapsed(){
 			return this->now - this->old;
 		}
 
+        inline void print(std::string p_msg){
+            if(m_print_time){
+                std::cout << p_msg << this->elapsed();
+            }            
+        }
+
+        inline void enable_print_time(){
+            m_print_time = true;
+        }
+
+        inline void disable_print_time(){
+            m_print_time = false;
+        }
+
 	protected:
+        bool m_print_time;
 		double now;
 		double old;
 	};
@@ -275,6 +290,7 @@ namespace WellSimulator {
 
 	real_type DriftFluxWell::ksi( real_type p_velocity ){
 		return p_velocity >= 0 ? 0.5 : -0.5;
+        //return 0.0;
 	}
 	
 	real_type DriftFluxWell::Volume( real_type dS ){
@@ -1300,12 +1316,6 @@ namespace WellSimulator {
 			real_type viscosity = 0.5*(p_gas_vol_fracP + p_gas_vol_fracE)*gas_viscosity	 ( mean_pressure ) 
 								+ 0.5*(p_oil_vol_fracP + p_oil_vol_fracE)*oil_viscosity	 ( mean_pressure ) 
 								+ 0.5*(water_vol_fracP + water_vol_fracE)*water_viscosity( mean_pressure );
-			
-			
-			
-			real_type Vc  = p_velocityP;			
-			real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2*m_radius/viscosity);
-			real_type f_P = this->friction_factor( Re );
 
 
             real_type mod_Vow_W	= this->mod_v_drift_flux_ow( 
@@ -1335,8 +1345,14 @@ namespace WellSimulator {
                 );
 
 
+            //real_type Vc  = p_velocityP;			
+            //real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2*m_radius/viscosity);
+            //real_type f_P = this->friction_factor( Re );
 
-
+            // OTHER Vc = j
+            real_type Vc = p_velocityP + 0.5*(p_gas_vol_fracP*(rhoL_P - rhoG_P)/rho_P*mod_Vgj_P + p_gas_vol_fracE*(rhoL_E - rhoG_E)/rho_E*mod_Vgj_E);
+            real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2.0*m_radius/viscosity);
+            real_type f_P = this->friction_factor( Re );
 
 
             real_type gas_vol_frac_W   = 0.5*(p_gas_vol_fracP + p_gas_vol_fracW);
@@ -1561,11 +1577,6 @@ namespace WellSimulator {
 								+ 0.5*(p_oil_vol_fracP + p_oil_vol_fracE)*oil_viscosity	 ( mean_pressure ) 
 								+ 0.5*(water_vol_fracP + water_vol_fracE)*water_viscosity( mean_pressure );
 
-			
-			real_type Vc  = p_velocityP;
-			real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2*m_radius/viscosity);
-			real_type f_P = this->friction_factor( Re );
-
 
             real_type mod_Vow_W	= this->mod_v_drift_flux_ow( 
                 p_velocityW, 0.5*(p_gas_vol_fracP + p_gas_vol_fracW), 0.5*(p_oil_vol_fracP + p_oil_vol_fracW),
@@ -1594,7 +1605,14 @@ namespace WellSimulator {
                 );
 
 
+            //real_type Vc  = p_velocityP;			
+            //real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2.0*m_radius/viscosity);
+            //real_type f_P = this->friction_factor( Re );
 
+            // OTHER Vc = j
+            real_type Vc = p_velocityP + 0.5*(p_gas_vol_fracP*(rhoL_P - rhoG_P)/rho_P*mod_Vgj_P + p_gas_vol_fracE*(rhoL_E - rhoG_E)/rho_E*mod_Vgj_E);
+            real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2.0*m_radius/viscosity);
+            real_type f_P = this->friction_factor( Re );
 
 
 
@@ -1823,10 +1841,7 @@ namespace WellSimulator {
 			real_type viscosity = 0.5*(p_gas_vol_fracP + p_gas_vol_fracE)*gas_viscosity	 ( mean_pressure ) 
 								+ 0.5*(p_oil_vol_fracP + p_oil_vol_fracE)*oil_viscosity	 ( mean_pressure ) 
 								+ 0.5*(water_vol_fracP + water_vol_fracE)*water_viscosity( mean_pressure );	
-			
-			real_type Vc  = p_velocityP;
-			real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2*m_radius/viscosity);
-            real_type f_P = this->friction_factor( Re );
+
 
             // New friction factor wells
             // OUYANG
@@ -1886,7 +1901,14 @@ namespace WellSimulator {
                 );
                 
 
-         
+            //real_type Vc  = p_velocityP;			
+            //real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2.0*m_radius/viscosity);
+            //real_type f_P = this->friction_factor( Re );
+
+            // OTHER Vc = j
+            real_type Vc = p_velocityP + 0.5*(p_gas_vol_fracP*(rhoL_P - rhoG_P)/rho_P*mod_Vgj_P + p_gas_vol_fracE*(rhoL_E - rhoG_E)/rho_E*mod_Vgj_E);
+            real_type Re  = abs(0.5*(rho_P + rho_E)*Vc*2.0*m_radius/viscosity);
+            real_type f_P = this->friction_factor( Re );
 
 
 
@@ -2954,54 +2976,78 @@ namespace WellSimulator {
 		return result.str();
 	}
 
+    void DriftFluxWell::update_variables_for_new_timestep(){
+        for( uint_type i = 0; i < number_of_nodes(); ++i){
+
+            m_gas_vol_frac_old[ i ]   = m_gas_vol_frac[ i ];			
+            m_oil_vol_frac_old[ i ]   = m_oil_vol_frac[ i ];
+            m_water_vol_frac_old[ i ] = m_water_vol_frac[ i ];
+            m_pressure_old[ i ]		  = m_pressure[ i ];		
+            m_mean_velocity_old[ i ]  = m_mean_velocity[ i ];
+
+            m_water_flow[i]->calculate_value_at_time(m_current_time);
+            m_oil_flow[i]->calculate_value_at_time(m_current_time);
+            m_gas_flow[i]->calculate_value_at_time(m_current_time);               
+        }    
+    }                     
+
 	void DriftFluxWell::solve()
 	{
+        bool check_time = false;
 		m_current_time = 0;
 
 		uint_type FINAL_TIMESTEP = this->m_FINAL_TIMESTEP;
-		for( uint_type i = 0; i < number_of_nodes(); ++i){
-			
-			m_gas_vol_frac_old[ i ]   = m_gas_vol_frac[ i ];			
-			m_oil_vol_frac_old[ i ]   = m_oil_vol_frac[ i ];
-			m_water_vol_frac_old[ i ] = m_water_vol_frac[ i ];
-			m_pressure_old[ i ]		  = m_pressure[ i ];		
-			m_mean_velocity_old[ i ]  = m_mean_velocity[ i ];
-			
-		}
+
+		this->update_variables_for_new_timestep();
 		
 		this->set_bottom_pressure( m_HEEL_PRESSURE ); // Pressure at heel is set
+
+        bool log_output_is_active = true;
+
+        std::ofstream log_results_file;
+        if(log_output_is_active)
+        {                           
+            log_results_file.open( "..\\WellData\\log_results.txt" );
+            log_results_file << "Current time" << "\t"
+                << "Newton Iter"	<< "\t"
+                << "Final norm"     << "\n";
+            log_results_file << std::setprecision(10);
+        }
 		
 		for(uint_type TIMESTEP = 0; TIMESTEP < FINAL_TIMESTEP; ++TIMESTEP){
 		//	(*m_water_flow)[ number_of_nodes()-1 ] = (TIMESTEP+1)*dt() > 10.0 ? 1.5 : 1.5*(TIMESTEP+1)*dt()/10;
 		//	(*m_oil_flow)[ number_of_nodes()-1 ]   = (TIMESTEP+1)*dt() > 10.0 ? 1.5 : 1.5*(TIMESTEP+1)*dt()/10;
 		//	(*m_gas_flow)[ number_of_nodes()-1 ]   = (TIMESTEP+1)*dt() > 10.0 ? 0.02 : 0.02*(TIMESTEP+1)*dt()/10;
 			
+
 			if(TIMESTEP){ 
 				// Only enters loop for TIMESTEP > 0                    
                 set_dt( calculate_new_delta_t_size_converged_solution( dt() ) );                 
-				for( uint_type i = 0; i < number_of_nodes(); ++i){
-					//real_type dalpha    = m_gas_vol_frac[ i ]-m_gas_vol_frac_old[ i ];
-					//real_type dpressure = m_pressure[ i ]-m_pressure_old[ i ];
-					//real_type dvelocity = m_mean_velocity[ i ]-m_mean_velocity_old[ i ];				
-					/*m_gas_vol_frac_old[ i ] = m_gas_vol_frac[ i ];
-					m_gas_vol_frac[ i ] =  m_gas_vol_frac[ i ] + dalpha;
+				//for( uint_type i = 0; i < number_of_nodes(); ++i){
+				//	//real_type dalpha    = m_gas_vol_frac[ i ]-m_gas_vol_frac_old[ i ];
+				//	//real_type dpressure = m_pressure[ i ]-m_pressure_old[ i ];
+				//	//real_type dvelocity = m_mean_velocity[ i ]-m_mean_velocity_old[ i ];				
+				//	/*m_gas_vol_frac_old[ i ] = m_gas_vol_frac[ i ];
+				//	m_gas_vol_frac[ i ] =  m_gas_vol_frac[ i ] + dalpha;
 
-					m_oil_vol_frac_old[ i ] = m_oil_vol_frac[ i ];
-					m_water_vol_frac_old[ i ] = m_water_vol_frac[ i ];
+				//	m_oil_vol_frac_old[ i ] = m_oil_vol_frac[ i ];
+				//	m_water_vol_frac_old[ i ] = m_water_vol_frac[ i ];
 
-					m_pressure_old[ i ] = m_pressure[ i ];
-					m_pressure[ i ]     = m_pressure[ i ] + 0*dpressure;
+				//	m_pressure_old[ i ] = m_pressure[ i ];
+				//	m_pressure[ i ]     = m_pressure[ i ] + 0*dpressure;
 
-					m_mean_velocity_old[ i ] = m_mean_velocity[ i ];
-					m_mean_velocity[ i ]     = m_mean_velocity[ i ] + 0*dvelocity;*/
+				//	m_mean_velocity_old[ i ] = m_mean_velocity[ i ];
+				//	m_mean_velocity[ i ]     = m_mean_velocity[ i ] + 0*dvelocity;*/
 
-					m_gas_vol_frac_old[ i ] = m_gas_vol_frac[ i ];	
-					m_oil_vol_frac_old[ i ] = m_oil_vol_frac[ i ];
-					//m_water_vol_frac_old[ i ] = m_water_vol_frac[ i ];
-					m_pressure_old[ i ] = m_pressure[ i ];	
-					m_mean_velocity_old[ i ] = m_mean_velocity[ i ];
-				
-				}
+				//	m_gas_vol_frac_old[ i ] = m_gas_vol_frac[ i ];	
+				//	m_oil_vol_frac_old[ i ] = m_oil_vol_frac[ i ];
+				//	//m_water_vol_frac_old[ i ] = m_water_vol_frac[ i ];
+				//	m_pressure_old[ i ] = m_pressure[ i ];	
+				//	m_mean_velocity_old[ i ] = m_mean_velocity[ i ];
+				//
+				//}
+
+                this->update_variables_for_new_timestep();
 
                 
 			}
@@ -3012,18 +3058,18 @@ namespace WellSimulator {
 			do
 			{
 				static Timer timer;
-				timer.start();
-				this->compute_Jacobian();							
-				timer.stop();
-				std::cout << "\njacobian time = " << timer.elapsed();
+                //timer.enable_print_time();
 
+                timer.start();                   
+				this->compute_Jacobian();
+                timer.stop();
+                timer.print("\njacobian time = ");
 
 				timer.start();
 				GMRES_Solve( *m_matrix, *m_variables, *m_source );
 				
 				timer.stop();
-				std::cout << "\nsolver time = " << timer.elapsed();
-
+                timer.print("\nsolver time = ");
 								
 				this->update_variables();			
 				
@@ -3048,8 +3094,9 @@ namespace WellSimulator {
 					cout << "mean_velocity[ "<< i <<" ] = " << this->m_mean_velocity[ i ] << "\n";			
 
 				}*/
-                if( norm_history.front() < norm_history.back() && r > 3)    m_convergence_status = true;
-                if(norma > this->NEWTON_CRIT && r > 20 || m_convergence_status){
+                //if( norm_history.front() < norm_history.back() && r > 3)    m_convergence_status = true;
+                m_convergence_status = false;
+                if(norma > this->NEWTON_CRIT && r > 50 || m_convergence_status){
                     set_dt( calculate_new_delta_t_size_diverged_solution( dt() ) ); 
                     std::cout << "\n********* Breaking timestep = " << dt();
                     int r_inner = 0;
@@ -3061,16 +3108,14 @@ namespace WellSimulator {
                         timer.start();
                         this->compute_Jacobian();							
                         timer.stop();
-                        std::cout << "\njacobian time = " << timer.elapsed();
-
+                        timer.print("\njacobian time = ");
 
                         timer.start();
                         GMRES_Solve( *m_matrix, *m_variables, *m_source );
 
                         timer.stop();
-                        std::cout << "\nsolver time = " << timer.elapsed();
-
-
+                        timer.print("\nsolver time = ");
+                       
                         this->update_variables();			
 
                         std::cout << std::setprecision(10);
@@ -3098,8 +3143,15 @@ namespace WellSimulator {
 
             m_current_time += this->dt();
             std::cout << "TIME: " << m_current_time << " seconds\n\n\n"; 
+                                           
+            if(log_output_is_active)
+            {          		
+                log_results_file << m_current_time	<< "\t"
+                    << r	    << "\t"
+                    << norma	<< "\n";                                 
+            }
 
-            double transient_norm = 0;
+            /*double transient_norm = 0;
             double transient_norm_P = 0;
             double transient_norm_alphaG = 0;
             double transient_norm_alphaO = 0;
@@ -3115,8 +3167,10 @@ namespace WellSimulator {
             transient_norm_alphaO = sqrt(transient_norm_alphaO);
             transient_norm_v = sqrt(transient_norm_v);
             transient_norm = 0.0*transient_norm_P + transient_norm_alphaG + transient_norm_alphaO + 0.0*transient_norm_v;
-            transient_norm = transient_norm/dt();
-            if(transient_norm < 1e-6 && TIMESTEP > 0 || TIMESTEP == FINAL_TIMESTEP-1 || abs(m_current_time - m_final_time) < 1.0e-8 )
+            transient_norm = transient_norm/dt();*/
+
+            //if(transient_norm < 1e-6 && TIMESTEP > 0 || TIMESTEP == FINAL_TIMESTEP-1 || abs(m_current_time - m_final_time) < 1.0e-8 )
+            if(TIMESTEP == FINAL_TIMESTEP-1 || abs(m_current_time - m_final_time) < 1.0e-8 )
             {
                 std::ofstream results_file;
                 //results_file.open( make_filename( "results", TIMESTEP, ".dat" ).c_str() );
@@ -3144,8 +3198,12 @@ namespace WellSimulator {
                 results_file.close();
                 break;
             }
-			
 		}
+
+        if(log_output_is_active)
+        {  
+            log_results_file.close();                     
+        }
 	}
 
 

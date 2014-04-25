@@ -47,9 +47,9 @@ void show_about_info(){
     gtk_window_set_icon(GTK_WINDOW(dialog), create_pixbuf(".\\images\\icon.png"));
     gtk_about_dialog_set_name(GTK_ABOUT_DIALOG(dialog), "WellDrift Simulator");
     gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), "v0.1"); 
-    gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog),"email: arthur@sinmec.ufsc.br\nDepartament of Mechanical Engineering\nFederal University of Santa Catarina - UFSC\nFlorianopolis - SC - Brazil");
+    gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog),"email: arthursoprano@gmail.com\nDepartament of Mechanical Engineering\nFederal University of Santa Catarina - UFSC\nFlorianopolis - SC - Brazil");
     
-    const char *authors[]= {"Arthur B. Soprano\t-\tMechanical Engineer",
+    const char *authors[]= {"Arthur B. Soprano\t-\tM.Sc. Mechanical Engineer",
                             "A. Fabio C. da Silva\t-\tProfessor",
                             "Clovis R. Maliska\t-\tProfessor", NULL};
    
