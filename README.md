@@ -1,5 +1,7 @@
 # README #
 
+# WellDrift #
+
 ### What is this repository for? ###
 
 **WellDrift** is a three-phase, one-dimensional, drift-flux well simulator. The problem is solved using the Finite Volume Method and a Newton-Raphson algorithm to solve the coupled equations.
