@@ -11,18 +11,8 @@ includedirs {
 	"./WellSim/include",
 	"./WinApi",
 	"../libgtkgraph",
-	"../../gtk+/include/",
-	"../../gtk+/include/atk-1.0",
-	"../../gtk+/include/glib-2.0",
-	"../../gtk+/include/gtk-2.0",
-	"../../gtk+/include/gdk-pixbuf-2.0",
-	"../../gtk+/include/cairo",
-	"../../gtk+/include/pango-1.0",
-	"../../gtk+/lib/gtk-2.0/include",
-	"../../gtk+/lib/glib-2.0/include",	
 }
 libdirs {
-	"../../gtk+/lib",
 }
 links {
 	"gtkgraph",

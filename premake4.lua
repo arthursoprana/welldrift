@@ -2,9 +2,9 @@ solution "WellDrift"
 
 configurations {"Release", "Debug"}
 configuration "Release"
-	flags {"StaticRuntime", "NoMinimalRebuild", "Unicode", "NoFramePointer", "OptimizeSpeed"}
+	flags {"StaticRuntime", "NoMinimalRebuild", "NoFramePointer", "OptimizeSpeed"}
 configuration "Debug"
-	flags {"StaticRuntime", "Symbols","NoMinimalRebuild", "Unicode", "NoEditAndContinue"}
+	flags {"StaticRuntime", "Symbols","NoMinimalRebuild", "NoEditAndContinue"}
 
 platforms {"x32","x64"}
 
@@ -30,10 +30,21 @@ location ("./Solution")
 
 includedirs {
 	"./",	
-	"../../boost_1_56_0",
+	"../boost_1_56_0",
+	"../gtk+/include",
+	"../gtk+/include/atk-1.0",
+	"../gtk+/include/glib-2.0",
+	"../gtk+/include/gtk-2.0",
+	"../gtk+/include/gdk-pixbuf-2.0",
+	"../gtk+/include/cairo",
+	"../gtk+/include/pango-1.0",
+	"../gtk+/lib/gtk-2.0/include",
+	"../gtk+/lib/glib-2.0/include",
+
 }
 libdirs {
-	"./lib",	
+	"./lib",
+	"../gtk+/lib",
 }
 
 include "./WellSimulator"

@@ -536,19 +536,19 @@ void gtk_graph_smith_set_Z0(GtkGraph *graph, gfloat Z0);
 
 
 /* libm.a version of rint() doesn't seem to link with dev-cpp so here's my own */
-static int rint(double f)
-{
-    int temp_i;
-    double temp_f;
-
-    temp_i = (int) f;
-    temp_f = f - (double) temp_i;
-
-    if (temp_f >= 0.5)
-        return temp_i + 1;
-    else
-        return temp_i;
-}
+//static int rint(double f)
+//{
+//    int temp_i;
+//    double temp_f;
+//
+//    temp_i = (int) f;
+//    temp_f = f - (double) temp_i;
+//
+//    if (temp_f >= 0.5)
+//        return temp_i + 1;
+//    else
+//        return temp_i;
+//}
 
 #ifdef __cplusplus
 }
