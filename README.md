@@ -1,31 +1,21 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
 ### What is this repository for? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+**WellDrift** is a three-phase, one-dimensional, drift-flux well simulator. The problem is solved using the Finite Volume Method and a Newton-Raphson algorithm to solve the coupled equations.
+
+* Version: 0.1
+
 
 ### How do I get set up? ###
+* run **build_projects.bat**
 
-* Summary of set up
-* Configuration
-* Dependencies
-boost
-gtk+ 2.0
-* Database configuration
-* How to run tests
-* Deployment instructions
+### Dependencies ###
+* *premake* (already included)
+* [boost](http://www.boost.org/)
+* [gtk+ 2.0](http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip)
 
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
 
 ### Who do I talk to? ###
 
-* Repo owner or admin
-* Other community or team contact
+* Repo owner (Arthur B. Soprano)
