@@ -11,6 +11,7 @@
 * run **build_projects.bat**
 
 ### Dependencies ###
+* *MTL - Matrix Template Library* and *ITL - Iterative Template Library* (already included)
 * *premake* (already included)
 * [boost](http://www.boost.org/)
 * [gtk+ 2.0](http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip)
