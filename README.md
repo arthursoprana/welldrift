@@ -1,6 +1,4 @@
-# README #
-
-# WellDrift #
+# README - WellDrift  #
 
 ### What is this repository for? ###
 
